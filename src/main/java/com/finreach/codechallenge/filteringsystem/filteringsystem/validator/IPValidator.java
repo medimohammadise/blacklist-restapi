@@ -12,7 +12,6 @@ public class ContactNumberValidator implements ConstraintValidator<IPValidatorCo
 
     @Override
     public boolean isValid(String ip, ConstraintValidatorContext cxt) {
-
        return InetAddresses.isInetAddress(ip);
     }
 }
