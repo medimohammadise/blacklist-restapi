@@ -74,10 +74,6 @@ public class FilterConfigurationResourceTest {
     public void removeFromBlackList() throws Exception {
         FilterConfigurationDTO filterConfigurationDTO=new FilterConfigurationDTO("192.9.200.1","192.9.200.15");
         restUserMockMvc.perform((delete("/api/filterConfiguration").contentType(MediaType.APPLICATION_JSON) .content(TestUtil.convertObjectToJsonBytes(filterConfigurationDTO))
-        ))
-
-                .andExpect(status().isOk())
-
-        ;
+        )).andExpect(status().isOk());
     }
 }

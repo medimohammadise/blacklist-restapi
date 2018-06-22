@@ -16,28 +16,28 @@ public class FilterConfigurationResource {
       this.filterConfigurationService=filterConfigurationService;
 
    }
-   @PutMapping
+   @RequestMapping(method=RequestMethod.PUT)
    public FilterConfigurationDTO saveFilterConfiguration(@Validated @RequestBody FilterConfigurationDTO filterConfigurationDTO){
        return filterConfigurationService.addFilterConfiguration(filterConfigurationDTO);
 
       
    }
 
-   @GetMapping
+   @RequestMapping(method=RequestMethod.GET)
    public List<FilterConfigurationDTO> getFilterConfigurationList(){
       return filterConfigurationService.getFilterConfigurationList();
 
    }
 
-   @GetMapping
-   @RequestMapping("/{lookupIp}")
+
+   @RequestMapping(method=RequestMethod.GET,value = "/{lookupIp}")
    public Boolean checkIpInBlackListOptimalMethod(@PathVariable String lookupIp) throws UnknownHostException {
       return filterConfigurationService.checkIPInBlackListOptimal(lookupIp);
 
    }
 
 
-   @DeleteMapping
+   @RequestMapping(method=RequestMethod.DELETE)
    public  List<FilterConfigurationDTO> getFilterConfigurationList(@Validated @RequestBody FilterConfigurationDTO filterConfigurationDTO){
       return filterConfigurationService.deleteFilterConfigurationList(filterConfigurationDTO);
 
