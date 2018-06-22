@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,11 +56,28 @@ public class FilterConfigurationResourceTest {
     }
 
     @Test
+    public void getBlackList() throws Exception {
+        restUserMockMvc.perform((get("/api/filterConfiguration"))
+        ).andExpect(status().isOk());
+    }
+
+    @Test
     public void isIPInBlackList() throws Exception {
         restUserMockMvc.perform((get("/api/filterConfiguration/" + LOOKUP_IP)
         ))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"))
+        ;
+    }
+
+    @Test
+    public void removeFromBlackList() throws Exception {
+        FilterConfigurationDTO filterConfigurationDTO=new FilterConfigurationDTO("192.9.200.1","192.9.200.15");
+        restUserMockMvc.perform((delete("/api/filterConfiguration").contentType(MediaType.APPLICATION_JSON) .content(TestUtil.convertObjectToJsonBytes(filterConfigurationDTO))
+        ))
+
+                .andExpect(status().isOk())
+
         ;
     }
 }
