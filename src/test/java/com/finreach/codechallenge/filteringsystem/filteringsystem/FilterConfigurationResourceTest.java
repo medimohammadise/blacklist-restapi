@@ -29,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FilteringsystemApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FilterConfigurationResourceTest {
-    private static final String LOOKUP_IP = "192.9.200.2";
+    private static final String EXTSING_LOOKUP_IP_INBLACKLIST = "192.9.200.2";
+    private static final String NOT_EXTSING_LOOKUP_IP_INBLACKLIST = "215.4.4.1";
     private MockMvc restUserMockMvc;
 
     @Autowired
@@ -56,20 +57,34 @@ public class FilterConfigurationResourceTest {
     }
 
     @Test
+    public void createFilterConfigurationWithInvalidIP() throws Exception {
+        FilterConfigurationDTO filterConfigurationDTO=new FilterConfigurationDTO("1","192.9.200.15");
+        restUserMockMvc.perform((put("/api/filterConfiguration").contentType(MediaType.APPLICATION_JSON) .content(TestUtil.convertObjectToJsonBytes(filterConfigurationDTO))
+        )).andExpect(status().isBadRequest());
+    }
+    @Test
     public void getBlackList() throws Exception {
         restUserMockMvc.perform((get("/api/filterConfiguration"))
         ).andExpect(status().isOk());
     }
 
     @Test
-    public void isIPInBlackList() throws Exception {
-        restUserMockMvc.perform((get("/api/filterConfiguration/" + LOOKUP_IP)
+    public void isIPInBlackListMatch() throws Exception {
+        restUserMockMvc.perform((get("/api/filterConfiguration/" + EXTSING_LOOKUP_IP_INBLACKLIST)
         ))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"))
         ;
     }
 
+    @Test
+    public void isIPInBlackListNotMacth() throws Exception {
+        restUserMockMvc.perform((get("/api/filterConfiguration/" + NOT_EXTSING_LOOKUP_IP_INBLACKLIST)
+        ))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"))
+        ;
+    }
     @Test
     public void removeFromBlackList() throws Exception {
         FilterConfigurationDTO filterConfigurationDTO=new FilterConfigurationDTO("192.9.200.1","192.9.200.15");

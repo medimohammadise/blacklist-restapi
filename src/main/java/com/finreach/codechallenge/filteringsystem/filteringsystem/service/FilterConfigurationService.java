@@ -68,6 +68,7 @@ public class FilterConfigurationService {
 
     public List<FilterConfigurationDTO> deleteFilterConfigurationList(FilterConfigurationDTO filterConfigurationDTO) {
         List<FilterConfiguration> filterConfigurationListToBeDeleted = filterConfigurationRepository.findByFromIPAndToIP(filterConfigurationDTO.getFromIP(), filterConfigurationDTO.getToIP());
+        if (filterConfigurationListToBeDeleted.size()==0) throw new RuntimeException("This ip range does not exist in the black list");
         filterConfigurationListToBeDeleted.stream().forEach(filterConfiguration -> {
             filterConfigurationRepository.delete(filterConfiguration);
         });
