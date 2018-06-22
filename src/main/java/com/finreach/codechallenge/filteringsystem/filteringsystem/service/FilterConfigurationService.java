@@ -4,6 +4,8 @@ import com.finreach.codechallenge.filteringsystem.filteringsystem.dto.FilterConf
 import com.finreach.codechallenge.filteringsystem.filteringsystem.mapper.FilterConfigurationMapper;
 import com.finreach.codechallenge.filteringsystem.filteringsystem.model.FilterConfiguration;
 import com.finreach.codechallenge.filteringsystem.filteringsystem.repository.FilterConfigurationRepository;
+import com.finreach.codechallenge.filteringsystem.filteringsystem.validator.IPValidatorConstraint;
+import com.google.common.net.InetAddresses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,10 @@ public class FilterConfigurationService {
         return filterConfigurationMapper.filterConfigurationToDTOList(filterConfigurationRepository.findAll());
     }
 
+
     public boolean checkIPInBlackListOptimal(String ip) throws UnknownHostException {
+        //I have to check this case here ! IPValidator did not work here haha.
+        if (!InetAddresses.isInetAddress(ip)) throw new RuntimeException("you enetered invalid IP!");
         InetAddress ipAddress = InetAddress.getByName(ip);
         Long lookupIp = ipToLong(ipAddress);
         //I am using parallel stream for checking IP in range using multiple threads.Let's ask Java8 to do thats

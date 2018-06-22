@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FilterConfigurationResourceTest {
     private static final String EXTSING_LOOKUP_IP_INBLACKLIST = "192.9.200.2";
     private static final String NOT_EXTSING_LOOKUP_IP_INBLACKLIST = "215.4.4.1";
+    private static final String INVALID_LOOKUP_IP_INBLACKLIST = "215.4333.2.3";
     private MockMvc restUserMockMvc;
 
     @Autowired
@@ -85,6 +86,13 @@ public class FilterConfigurationResourceTest {
                 .andExpect(content().string("false"))
         ;
     }
+
+    @Test
+    public void isIPInBlackListInvalidIP() throws Exception {
+        restUserMockMvc.perform((get("/api/filterConfiguration/" + INVALID_LOOKUP_IP_INBLACKLIST)
+        )).andExpect(status().isInternalServerError());
+    }
+
     @Test
     public void removeFromBlackList() throws Exception {
         FilterConfigurationDTO filterConfigurationDTO=new FilterConfigurationDTO("192.9.200.1","192.9.200.15");

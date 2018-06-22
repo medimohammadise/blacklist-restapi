@@ -2,6 +2,7 @@ package com.finreach.codechallenge.filteringsystem.filteringsystem.rest;
 
 import com.finreach.codechallenge.filteringsystem.filteringsystem.dto.FilterConfigurationDTO;
 import com.finreach.codechallenge.filteringsystem.filteringsystem.service.FilterConfigurationService;
+import com.finreach.codechallenge.filteringsystem.filteringsystem.validator.IPValidatorConstraint;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class FilterConfigurationResource {
    }
 
 
-   @RequestMapping(method=RequestMethod.GET,value = "/{lookupIp}")
+   @RequestMapping(method=RequestMethod.GET,value = "/{lookupIp:.+}")
    public Boolean checkIpInBlackListOptimalMethod(@PathVariable String lookupIp) throws UnknownHostException {
       return filterConfigurationService.checkIPInBlackListOptimal(lookupIp);
 
