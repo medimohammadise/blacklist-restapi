@@ -4,8 +4,10 @@ import com.google.common.net.InetAddresses;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-public class ContactNumberValidator implements ConstraintValidator<IPValidatorConstraint, String>{
+/*
+   this class validates IP using guava library
+ */
+public class IPValidator implements ConstraintValidator<IPValidatorConstraint, String>{
     @Override
     public void initialize(IPValidatorConstraint ip) {
     }

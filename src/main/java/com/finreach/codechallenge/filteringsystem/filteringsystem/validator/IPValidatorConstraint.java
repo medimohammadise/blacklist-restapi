@@ -10,7 +10,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = ContactNumberValidator.class)
+@Constraint(validatedBy = IPValidator.class)
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IPValidatorConstraint {

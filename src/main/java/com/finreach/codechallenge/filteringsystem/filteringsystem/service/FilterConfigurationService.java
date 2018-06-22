@@ -4,6 +4,8 @@ import com.finreach.codechallenge.filteringsystem.filteringsystem.dto.FilterConf
 import com.finreach.codechallenge.filteringsystem.filteringsystem.mapper.FilterConfigurationMapper;
 import com.finreach.codechallenge.filteringsystem.filteringsystem.model.FilterConfiguration;
 import com.finreach.codechallenge.filteringsystem.filteringsystem.repository.FilterConfigurationRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -12,41 +14,49 @@ import java.util.List;
 
 @Service
 public class FilterConfigurationService {
-   FilterConfigurationRepository filterConfigurationRepository;
-   FilterConfigurationMapper filterConfigurationMapper;
-   public FilterConfigurationService(FilterConfigurationRepository filterConfigurationRepository,
-                                     FilterConfigurationMapper filterConfigurationMapper){
-      this.filterConfigurationRepository=filterConfigurationRepository;
-      this.filterConfigurationMapper=filterConfigurationMapper;
+    Logger log = LoggerFactory.getLogger(getClass());
+    FilterConfigurationRepository filterConfigurationRepository;
+    FilterConfigurationMapper filterConfigurationMapper;
 
-   }
-   public FilterConfigurationDTO addFilterConfiguration(FilterConfigurationDTO filterConfigurationDTO){
+    public FilterConfigurationService(FilterConfigurationRepository filterConfigurationRepository,
+                                      FilterConfigurationMapper filterConfigurationMapper) {
+        this.filterConfigurationRepository = filterConfigurationRepository;
+        this.filterConfigurationMapper = filterConfigurationMapper;
 
-              return  filterConfigurationMapper.filterConfigurationToDTO(filterConfigurationRepository.save(filterConfigurationMapper.filterConfigurationDTOToFilterConfiguration(filterConfigurationDTO)));
-   }
-    public List<FilterConfigurationDTO> getFilterConfigurationList(){
+    }
+
+    public FilterConfigurationDTO addFilterConfiguration(FilterConfigurationDTO filterConfigurationDTO) {
+
+        return filterConfigurationMapper.filterConfigurationToDTO(filterConfigurationRepository.save(filterConfigurationMapper.filterConfigurationDTOToFilterConfiguration(filterConfigurationDTO)));
+    }
+
+    public List<FilterConfigurationDTO> getFilterConfigurationList() {
         return filterConfigurationMapper.filterConfigurationToDTOList(filterConfigurationRepository.findAll());
     }
 
     public boolean checkIPInBlackListOptimal(String ip) throws UnknownHostException {
-        InetAddress ipAddress=InetAddress.getByName(ip);
-        Long lookupIp=ipToLong(ipAddress);
-        return filterConfigurationRepository.findAll().parallelStream().map(ipFilterConfig->{
+        InetAddress ipAddress = InetAddress.getByName(ip);
+        Long lookupIp = ipToLong(ipAddress);
+        //I am using parallel stream for checking IP in range using multiple threads.Let's ask Java8 to do thats
+        return filterConfigurationRepository.findAll().parallelStream().map(ipFilterConfig -> {
             try {
-                if (lookupIp>=ipToLong(InetAddress.getByName(ipFilterConfig.getFromIP()))
-                        && lookupIp<=ipToLong(InetAddress.getByName(ipFilterConfig.getToIP()))) {
+                //I did not consider other lazy methods, I think converting IP into the long is the best method!
+                if (lookupIp >= ipToLong(InetAddress.getByName(ipFilterConfig.getFromIP()))
+                        && lookupIp <= ipToLong(InetAddress.getByName(ipFilterConfig.getToIP()))) {
                     return true;
                 }
             } catch (UnknownHostException e) {
-                e.printStackTrace();
+                log.debug("facing error in ip checking, there might be some invalid ip already in database");
             }
             return false;
-        }).filter(item->item==true).findFirst().isPresent();
+        }).filter(item -> item == true).findFirst().isPresent();
 
     }
 
-
-    public long ipToLong(InetAddress ip) {
+    /*
+       this method converts Ip into long value for optimized ip comparsion for checking in the blackList
+    */
+    private long ipToLong(InetAddress ip) {
         byte[] octets = ip.getAddress();
         long result = 0;
         for (byte octet : octets) {
@@ -57,8 +67,8 @@ public class FilterConfigurationService {
     }
 
     public List<FilterConfigurationDTO> deleteFilterConfigurationList(FilterConfigurationDTO filterConfigurationDTO) {
-        List<FilterConfiguration> filterConfigurationListToBeDeleted=filterConfigurationRepository.findByFromIPAndToIP(filterConfigurationDTO.getFromIP(),filterConfigurationDTO.getToIP());
-        filterConfigurationListToBeDeleted.stream().forEach(filterConfiguration-> {
+        List<FilterConfiguration> filterConfigurationListToBeDeleted = filterConfigurationRepository.findByFromIPAndToIP(filterConfigurationDTO.getFromIP(), filterConfigurationDTO.getToIP());
+        filterConfigurationListToBeDeleted.stream().forEach(filterConfiguration -> {
             filterConfigurationRepository.delete(filterConfiguration);
         });
         return filterConfigurationMapper.filterConfigurationToDTOList(filterConfigurationListToBeDeleted);
